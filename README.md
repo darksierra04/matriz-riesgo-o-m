@@ -1,6 +1,9 @@
 # Matriz de Riesgo O&M
 
 Dashboard web (HTML/CSS/JS) para registrar y visualizar riesgos de O&M por tipo de proyecto.
+## Captura
+![Dashboard](screenshot-dashboard.png)
+
 
 ## Demo
 - GitHub Pages: (https://darksierra04.github.io/matriz-riesgo-o-m/)
