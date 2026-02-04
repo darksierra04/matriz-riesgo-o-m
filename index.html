@@ -1133,6 +1133,7 @@
                 fecha: new Date().toISOString().split('T')[0],
                 tipo,
                 categoria,
+                nombreProyecto: nombreProyecto,
                 fase,
                 descripcion,
                 causa,
@@ -1146,6 +1147,7 @@
                 impactoResidual,
                 nivelResidual: probResidual * impactoResidual,
                 estado
+
             };
 
             risk.clasificacionInherente = getRiskClassification(risk.nivelInherente);
