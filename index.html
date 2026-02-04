@@ -1,0 +1,1454 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Matriz de Riesgo O&M  - GreenYellow</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #5fd300 0%, #f1e20d 100%);
+            padding: 40px;
+            min-height: 50vh;
+        }
+        
+        .container {
+            max-width: 1300px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 70px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #50721e 0%, #b9cb0e 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+        
+        .tabs {
+            display: flex;
+            background: #f8f9fa;
+            border-bottom: 2px solid #dee2e6;
+        }
+        
+        .tab {
+            flex: 1;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            background: #f8f9fa;
+            border: none;
+            font-size: 1em;
+            font-weight: 600;
+            transition: all 0.3s;
+            color: #495057;
+        }
+        
+        .tab:hover {
+            background: #e9ecef;
+        }
+        
+        .tab.active {
+            background: white;
+            color: #000000;
+            border-bottom: 3px solid #2a5298;
+        }
+        
+        .tab-content {
+            display: none;
+            padding: 30px;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .filter-section {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+        
+        .filter-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 15px;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 600;
+            transition: all 0.3s;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        .btn-primary {
+            background: #2a5298;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #e7e032;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+        }
+        
+        .btn-filter {
+            background: white;
+            color: #495057;
+            border: 2px solid #dee2e6;
+        }
+        
+        .btn-filter:hover {
+            border-color: #2a5298;
+            color: #2a5298;
+        }
+        
+        .btn-filter.active {
+            background: #2a5298;
+            color: white;
+            border-color: #2a5298;
+        }
+        
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background: #882154;
+        }
+        
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background: #c82333;
+        }
+        
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .kpi-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            border-radius: 10px;
+            color: white;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        .kpi-card.green {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+        }
+        
+        .kpi-card.yellow {
+            background: linear-gradient(135deg, #f7971e 0%, #ffd200 100%);
+        }
+        
+        .kpi-card.orange {
+            background: linear-gradient(135deg, #ee0979 0%, #ff6a00 100%);
+        }
+        
+        .kpi-card.red {
+            background: linear-gradient(135deg, #c31432 0%, #240b36 100%);
+        }
+        
+        .kpi-card h3 {
+            font-size: 0.9em;
+            margin-bottom: 10px;
+            opacity: 0.9;
+        }
+        
+        .kpi-card .value {
+            font-size: 2.5em;
+            font-weight: bold;
+        }
+        
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .form-group label {
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #495057;
+        }
+        
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            padding: 10px;
+            border: 2px solid #dee2e6;
+            border-radius: 5px;
+            font-size: 1em;
+            transition: border-color 0.3s;
+        }
+        
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #2a5298;
+        }
+        
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+        
+        .risk-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .risk-table th {
+            background: #2a5298;
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+        }
+        
+        .risk-table td {
+            padding: 12px;
+            border-bottom: 1px solid #dee2e6;
+        }
+        
+        .risk-table tr:hover {
+            background: #f8f9fa;
+        }
+        
+        .risk-level {
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-weight: 600;
+            text-align: center;
+            display: inline-block;
+            min-width: 80px;
+        }
+        
+        .risk-bajo {
+            background: #C6EFCE;
+            color: #006100;
+        }
+        
+        .risk-medio {
+            background: #FFEB9C;
+            color: #9C6500;
+        }
+        
+        .risk-alto {
+            background: #FFC7CE;
+            color: #9C0006;
+        }
+        
+        .risk-critico {
+            background: #FF0000;
+            color: white;
+        }
+        
+        .matrix-container {
+            overflow-x: auto;
+            margin-top: 30px;
+        }
+        
+        .heat-matrix {
+            margin: 0 auto;
+            border-collapse: separate;
+            border-spacing: 5px;
+        }
+        
+        .heat-matrix th,
+        .heat-matrix td {
+            width: 80px;
+            height: 80px;
+            text-align: center;
+            vertical-align: middle;
+            border-radius: 8px;
+            font-weight: bold;
+        }
+        
+        .heat-matrix th {
+            background: #2a5298;
+            color: white;
+        }
+        
+        .heat-matrix .label-cell {
+            background: #f8f9fa;
+            color: #495057;
+            font-weight: 600;
+        }
+        
+        .heat-cell {
+            cursor: pointer;
+            transition: transform 0.2s;
+            position: relative;
+        }
+        
+        .heat-cell:hover {
+            transform: scale(1.1);
+            z-index: 10;
+        }
+        
+        .heat-cell .count {
+            font-size: 1.5em;
+            font-weight: bold;
+        }
+        
+        .heat-cell .value {
+            font-size: 0.8em;
+            opacity: 0.8;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 5px;
+        }
+        
+        .btn-small {
+            padding: 5px 10px;
+            font-size: 0.9em;
+        }
+        
+        .chart-container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .chart-title {
+            font-size: 1.3em;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #2a5298;
+        }
+        
+        .bar-chart {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .bar-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .bar-label {
+            min-width: 120px;
+            font-weight: 600;
+        }
+        
+        .bar-container {
+            flex: 1;
+            background: #e9ecef;
+            height: 30px;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        
+        .bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 10px;
+            color: white;
+            font-weight: bold;
+            transition: width 0.5s;
+        }
+        
+        .export-section {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+        
+        @media print {
+            body {
+                background: white;
+            }
+            .tabs, .btn, .export-section {
+                display: none;
+            }
+        }
+        .brand-logo{
+  height: 250px;        /* cambia este número */
+  width: auto;         /* mantiene proporción */
+  object-fit: contain; /* evita deformación */
+}
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+    <div class="brand">
+        <img class="brand-logo" src="logo_greenyellow1.png" alt="GreenYellow">
+    </div>
+    <h1>Matriz de Riesgo O&amp;M</h1>
+    <p>GreenYellow Colombia | Sistema de Gestión de Riesgos</p>
+</div>
+
+        
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('dashboard')"> Dashboard</button>
+            <button class="tab" onclick="switchTab('registro')"> Registro de Riesgos</button>
+            <button class="tab" onclick="switchTab('matriz')"> Matriz de Calor</button>
+            <button class="tab" onclick="switchTab('analisis')"> Análisis</button>
+        </div>
+        
+        <!-- Dashboard Tab -->
+        <div id="dashboard" class="tab-content active">
+            <div class="filter-section">
+                <h3 style="margin-bottom: 15px;">Filtrar por Tipo de Proyecto:</h3>
+                <div class="filter-buttons">
+                    <button class="btn btn-filter active" onclick="filterByProject('TODOS')">TODOS</button>
+                    <button class="btn btn-filter" onclick="filterByProject('AGPE')">AGPE</button>
+                    <button class="btn btn-filter" onclick="filterByProject('AGGE')">AGGE</button>
+                    <button class="btn btn-filter" onclick="filterByProject('GD')">GD</button>
+                    <button class="btn btn-filter" onclick="filterByProject('Utility')">Utility Scale</button>
+                </div>
+            </div>
+            
+            <div class="kpi-grid">
+                <div class="kpi-card">
+                    <h3>Total de Riesgos</h3>
+                    <div class="value" id="kpi-total">0</div>
+                </div>
+                <div class="kpi-card green">
+                    <h3>Riesgos Bajo</h3>
+                    <div class="value" id="kpi-bajo">0</div>
+                </div>
+                <div class="kpi-card yellow">
+                    <h3>Riesgos Medio</h3>
+                    <div class="value" id="kpi-medio">0</div>
+                </div>
+                <div class="kpi-card orange">
+                    <h3>Riesgos Alto</h3>
+                    <div class="value" id="kpi-alto">0</div>
+                </div>
+                <div class="kpi-card red">
+                    <h3>Riesgos Crítico</h3>
+                    <div class="value" id="kpi-critico">0</div>
+                </div>
+                <div class="kpi-card green">
+                    <h3>Efectividad Mitigación</h3>
+                    <div class="value" id="kpi-efectividad">0%</div>
+                </div>
+            </div>
+            
+            <div class="chart-container">
+                <div class="chart-title">Distribución de Riesgos por Categoría</div>
+                <div class="bar-chart" id="category-chart"></div>
+            </div>
+            
+            <div class="chart-container">
+                <div class="chart-title">Riesgos por Fase del Proyecto</div>
+                <div class="bar-chart" id="phase-chart"></div>
+            </div>
+        </div>
+        
+        <!-- Registro Tab -->
+        <div id="registro" class="tab-content">
+            <h2 style="margin-bottom: 20px;">Registrar Nuevo Riesgo</h2>
+            
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>Tipo de Proyecto *</label>
+                    <select id="tipo-proyecto">
+                        <option value="AGPE">AGPE - Autogeneración Pequeña Escala</option>
+                        <option value="AGGE">AGGE - Autogeneración Gran Escala</option>
+                        <option value="GD">GD - Generación Distribuida</option>
+                        <option value="Utility">Utility Scale</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>Categoría *</label>
+                    <select id="categoria">
+                        <option value="Técnico">Técnico</option>
+                        <option value="Regulatorio">Regulatorio</option>
+                        <option value="Social">Social</option>
+                        <option value="Ambiental">Ambiental</option>
+                        <option value="Contractual">Contractual</option>
+                        <option value="Financiero">Financiero</option>
+                    </select>
+                </div>
+                <div class="form-group">
+  <label>Proyecto *</label>
+  <select id="nombre-proyecto">
+    <option value="">-- Seleccione --</option>
+    <option>Aldor</option>
+    <option>Alejandria</option>
+    <option>Americana de Curtidos</option>
+    <option>Viva Wajira 3</option>
+    <option>ARA Chiquinquira</option>
+    <option>ARA Manuela Beltran</option>
+    <option>Caiman</option>
+    <option>Carulla 140</option>
+    <option>Carulla Oviedo</option>
+    <option>Carulla Rincon</option>
+    <option>CC Panorama</option>
+    <option>CC Sushiimma</option>
+    <option>CEDI Latam</option>
+    <option>Centro Comercial Americano</option>
+    <option>Coveñas</option>
+    <option>Dinamarca</option>
+    <option>Ditar</option>
+    <option>Diverplaza</option>
+    <option>EXCO</option>
+    <option>Éxito Calle 77</option>
+    <option>Éxito Colina</option>
+    <option>Éxito Ibague</option>
+    <option>Éxito Libertador</option>
+    <option>Éxito Magangue</option>
+    <option>Éxito Neiva</option>
+    <option>Éxito San Fernando</option>
+    <option>Frigorificos BLE</option>
+    <option>Groupe SEB</option>
+    <option>GY Solar AURORA</option>
+    <option>Isla del Encanto</option>
+    <option>La Mena</option>
+    <option>NU3</option>
+    <option>Paseo Villa del Rio</option>
+    <option>Plasticel</option>
+    <option>Plaza Imperial</option>
+    <option>Tigo Titanium</option>
+    <option>Unicentro Villavicencio</option>
+    <option>Unicentro Yopal</option>
+    <option>Vasconia</option>
+    <option>Versalles</option>
+    <option>Viva Barranquilla</option>
+    <option>Viva Envigado</option>
+    <option>Viva Fontibon</option>
+    <option>Viva Laureles</option>
+    <option>VIVA Palmas</option>
+    <option>Viva Sincelejo</option>
+    <option>VIVA Villavicencio</option>
+    <option>Viva Wajira 2</option>
+    <option>Santo Tomas</option>
+    <option>Isabel Lopez</option>
+    <option>CDI exhibiciones</option>
+    <option>CEMEX</option>
+    <option>AVINSA</option>
+    <option>JEQUES</option>
+    <option>Puerto Barranquilla</option>
+    <option value="__OTRO__">Otro (escribir)</option>
+  </select>
+</div>
+
+<div class="form-group" id="otro-proyecto-group" style="display:none;">
+  <label>Otro proyecto *</label>
+  <input type="text" id="otro-proyecto" placeholder="Escriba el nombre del proyecto">
+</div>
+
+                <div class="form-group">
+                    <label>Fase del Proyecto *</label>
+                    <select id="fase">
+                        <option value="Construcción">Construcción</option>
+                        <option value="Puesta en Marcha">Puesta en Marcha</option>
+                        <option value="O&M">O&M (Operación y Mantenimiento)</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>Controlabilidad</label>
+                    <select id="controlabilidad">
+                        <option value="Controlable">Controlable</option>
+                        <option value="Parcialmente">Parcialmente Controlable</option>
+                        <option value="No Controlable">No Controlable</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="form-grid">
+                <div class="form-group" style="grid-column: 1 / -1;">
+                    <label>Descripción del Riesgo *</label>
+                    <textarea id="descripcion" placeholder="Describa el riesgo identificado..."></textarea>
+                </div>
+                
+                <div class="form-group" style="grid-column: 1 / -1;">
+                    <label>Causa Raíz</label>
+                    <textarea id="causa" placeholder="¿Qué causa este riesgo?"></textarea>
+                </div>
+            </div>
+            
+            <h3 style="margin: 30px 0 15px 0;">Evaluación de Riesgo Inherente</h3>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>Probabilidad Inherente *</label>
+                    <select id="prob-inherente">
+                        <option value="1">1 - Muy Baja (&lt;10%)</option>
+                        <option value="2">2 - Baja (10-30%)</option>
+                        <option value="3">3 - Media (30-50%)</option>
+                        <option value="4">4 - Alta (50-75%)</option>
+                        <option value="5">5 - Muy Alta (&gt;75%)</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>Impacto Inherente *</label>
+                    <select id="impacto-inherente">
+                        <option value="1">1 - Insignificante (&lt;0.5% CAPEX)</option>
+                        <option value="2">2 - Menor (0.5-2% CAPEX)</option>
+                        <option value="3">3 - Moderado (2-5% CAPEX)</option>
+                        <option value="4">4 - Mayor (5-10% CAPEX)</option>
+                        <option value="5">5 - Catastrófico (&gt;10% CAPEX)</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="form-grid">
+                <div class="form-group" style="grid-column: 1 / -1;">
+                    <label>Medidas de Mitigación</label>
+                    <textarea id="mitigacion" placeholder="¿Qué acciones se tomarán para mitigar este riesgo?"></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label>Responsable</label>
+                    <input type="text" id="responsable" placeholder="Nombre del responsable">
+                </div>
+            </div>
+            
+            <h3 style="margin: 30px 0 15px 0;">Evaluación de Riesgo Residual (Post-Mitigación)</h3>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>Probabilidad Residual</label>
+                    <select id="prob-residual">
+                        <option value="1">1 - Muy Baja (&lt;10%)</option>
+                        <option value="2">2 - Baja (10-30%)</option>
+                        <option value="3">3 - Media (30-50%)</option>
+                        <option value="4">4 - Alta (50-75%)</option>
+                        <option value="5">5 - Muy Alta (&gt;75%)</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>Impacto Residual</label>
+                    <select id="impacto-residual">
+                        <option value="1">1 - Insignificante (&lt;0.5% CAPEX)</option>
+                        <option value="2">2 - Menor (0.5-2% CAPEX)</option>
+                        <option value="3">3 - Moderado (2-5% CAPEX)</option>
+                        <option value="4">4 - Mayor (5-10% CAPEX)</option>
+                        <option value="5">5 - Catastrófico (&gt;10% CAPEX)</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>Estado</label>
+                    <select id="estado">
+                        <option value="Abierto">Abierto</option>
+                        <option value="En Tratamiento">En Tratamiento</option>
+                        <option value="Cerrado">Cerrado</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div style="margin-top: 30px; display: flex; gap: 10px;">
+                <button class="btn btn-success" onclick="addRisk()">✅ Registrar Riesgo</button>
+                <button class="btn btn-danger" onclick="clearForm()">🗑️ Limpiar Formulario</button>
+            </div>
+            
+            <h2 style="margin: 40px 0 20px 0;">Lista de Riesgos Registrados</h2>
+            <div style="overflow-x: auto;">
+                <table class="risk-table" id="risk-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Proyecto</th>
+                            <th>Nombre Proyecto</th>
+                            <th>Categoría</th>
+                            <th>Fase</th>
+                            <th>Descripción</th>
+                            <th>Prob.</th>
+                            <th>Imp.</th>
+                            <th>Nivel</th>
+                            <th>Clasificación</th>
+                            <th>Responsable</th>
+                            <th>Estado</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="risk-table-body">
+                        <tr>
+                            <td colspan="12" style="text-align: center; color: #999;">No hay riesgos registrados. Agregue el primero usando el formulario.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <!-- Matriz de Calor Tab -->
+        <div id="matriz" class="tab-content">
+            <h2 style="margin-bottom: 20px; text-align: center;">Matriz de Calor - Probabilidad vs Impacto</h2>
+            <p style="text-align: center; color: #666; margin-bottom: 30px;">
+                Los números indican la cantidad de riesgos en cada nivel. Haga clic en cada celda para ver detalles.
+            </p>
+            
+            <div class="matrix-container">
+                <table class="heat-matrix">
+                    <tr>
+                        <th colspan="2" rowspan="2"></th>
+                        <th colspan="5">IMPACTO</th>
+                    </tr>
+                    <tr>
+                        <th>1<br>Insignif.</th>
+                        <th>2<br>Menor</th>
+                        <th>3<br>Moderado</th>
+                        <th>4<br>Mayor</th>
+                        <th>5<br>Catastrof.</th>
+                    </tr>
+                    <tr>
+                        <th rowspan="5" style="writing-mode: vertical-lr; transform: rotate(180deg);">PROBABILIDAD</th>
+                        <th>5<br>Muy Alta</th>
+                        <td class="heat-cell" data-prob="5" data-imp="1" onclick="showRisksInCell(5,1)">
+                            <div class="count" id="cell-5-1">0</div>
+                            <div class="value">[5]</div>
+                        </td>
+                        <td class="heat-cell" data-prob="5" data-imp="2" onclick="showRisksInCell(5,2)">
+                            <div class="count" id="cell-5-2">0</div>
+                            <div class="value">[10]</div>
+                        </td>
+                        <td class="heat-cell" data-prob="5" data-imp="3" onclick="showRisksInCell(5,3)">
+                            <div class="count" id="cell-5-3">0</div>
+                            <div class="value">[15]</div>
+                        </td>
+                        <td class="heat-cell" data-prob="5" data-imp="4" onclick="showRisksInCell(5,4)">
+                            <div class="count" id="cell-5-4">0</div>
+                            <div class="value">[20]</div>
+                        </td>
+                        <td class="heat-cell" data-prob="5" data-imp="5" onclick="showRisksInCell(5,5)">
+                            <div class="count" id="cell-5-5">0</div>
+                            <div class="value">[25]</div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>4<br>Alta</th>
+                        <td class="heat-cell" data-prob="4" data-imp="1" onclick="showRisksInCell(4,1)">
+                            <div class="count" id="cell-4-1">0</div>
+                            <div class="value">[4]</div>
+                        </td>
+                        <td class="heat-cell" data-prob="4" data-imp="2" onclick="showRisksInCell(4,2)">
+                            <div class="count" id="cell-4-2">0</div>
+                            <div class="value">[8]</div>
+                        </td>
+                        <td class="heat-cell" data-prob="4" data-imp="3" onclick="showRisksInCell(4,3)">
+                            <div class="count" id="cell-4-3">0</div>
+                            <div class="value">[12]</div>
+                        </td>
+                        <td class="heat-cell" data-prob="4" data-imp="4" onclick="showRisksInCell(4,4)">
+                            <div class="count" id="cell-4-4">0</div>
+                            <div class="value">[16]</div>
+                        </td>
+                        <td class="heat-cell" data-prob="4" data-imp="5" onclick="showRisksInCell(4,5)">
+                            <div class="count" id="cell-4-5">0</div>
+                            <div class="value">[20]</div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>3<br>Media</th>
+                        <td class="heat-cell" data-prob="3" data-imp="1" onclick="showRisksInCell(3,1)">
+                            <div class="count" id="cell-3-1">0</div>
+                            <div class="value">[3]</div>
+                        </td>
+                        <td class="heat-cell" data-prob="3" data-imp="2" onclick="showRisksInCell(3,2)">
+                            <div class="count" id="cell-3-2">0</div>
+                            <div class="value">[6]</div>
+                        </td>
+                        <td class="heat-cell" data-prob="3" data-imp="3" onclick="showRisksInCell(3,3)">
+                            <div class="count" id="cell-3-3">0</div>
+                            <div class="value">[9]</div>
+                        </td>
+                        <td class="heat-cell" data-prob="3" data-imp="4" onclick="showRisksInCell(3,4)">
+                            <div class="count" id="cell-3-4">0</div>
+                            <div class="value">[12]</div>
+                        </td>
+                        <td class="heat-cell" data-prob="3" data-imp="5" onclick="showRisksInCell(3,5)">
+                            <div class="count" id="cell-3-5">0</div>
+                            <div class="value">[15]</div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>2<br>Baja</th>
+                        <td class="heat-cell" data-prob="2" data-imp="1" onclick="showRisksInCell(2,1)">
+                            <div class="count" id="cell-2-1">0</div>
+                            <div class="value">[2]</div>
+                        </td>
+                        <td class="heat-cell" data-prob="2" data-imp="2" onclick="showRisksInCell(2,2)">
+                            <div class="count" id="cell-2-2">0</div>
+                            <div class="value">[4]</div>
+                        </td>
+                        <td class="heat-cell" data-prob="2" data-imp="3" onclick="showRisksInCell(2,3)">
+                            <div class="count" id="cell-2-3">0</div>
+                            <div class="value">[6]</div>
+                        </td>
+                        <td class="heat-cell" data-prob="2" data-imp="4" onclick="showRisksInCell(2,4)">
+                            <div class="count" id="cell-2-4">0</div>
+                            <div class="value">[8]</div>
+                        </td>
+                        <td class="heat-cell" data-prob="2" data-imp="5" onclick="showRisksInCell(2,5)">
+                            <div class="count" id="cell-2-5">0</div>
+                            <div class="value">[10]</div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>1<br>Muy Baja</th>
+                        <td class="heat-cell" data-prob="1" data-imp="1" onclick="showRisksInCell(1,1)">
+                            <div class="count" id="cell-1-1">0</div>
+                            <div class="value">[1]</div>
+                        </td>
+                        <td class="heat-cell" data-prob="1" data-imp="2" onclick="showRisksInCell(1,2)">
+                            <div class="count" id="cell-1-2">0</div>
+                            <div class="value">[2]</div>
+                        </td>
+                        <td class="heat-cell" data-prob="1" data-imp="3" onclick="showRisksInCell(1,3)">
+                            <div class="count" id="cell-1-3">0</div>
+                            <div class="value">[3]</div>
+                        </td>
+                        <td class="heat-cell" data-prob="1" data-imp="4" onclick="showRisksInCell(1,4)">
+                            <div class="count" id="cell-1-4">0</div>
+                            <div class="value">[4]</div>
+                        </td>
+                        <td class="heat-cell" data-prob="1" data-imp="5" onclick="showRisksInCell(1,5)">
+                            <div class="count" id="cell-1-5">0</div>
+                            <div class="value">[5]</div>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            
+            <div style="margin-top: 40px; background: #f8f9fa; padding: 20px; border-radius: 10px;">
+                <h3 style="margin-bottom: 15px;">Leyenda de Clasificación:</h3>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <span class="risk-level risk-bajo">BAJO</span>
+                        <span>Nivel 1-5</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <span class="risk-level risk-medio">MEDIO</span>
+                        <span>Nivel 6-12</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <span class="risk-level risk-alto">ALTO</span>
+                        <span>Nivel 13-20</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <span class="risk-level risk-critico">CRÍTICO</span>
+                        <span>Nivel 21-25</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Análisis Tab -->
+        <div id="analisis" class="tab-content">
+            <h2 style="margin-bottom: 20px;">Análisis y Exportación de Datos</h2>
+            
+            <div class="chart-container">
+                <div class="chart-title">Distribución de Riesgos por Tipo de Proyecto</div>
+                <div class="bar-chart" id="project-chart"></div>
+            </div>
+            
+            <div class="chart-container">
+                <div class="chart-title">Comparación: Riesgo Inherente vs Residual</div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                    <div>
+                        <h4 style="margin-bottom: 10px; text-align: center;">Inherente</h4>
+                        <div class="bar-chart" id="inherent-chart"></div>
+                    </div>
+                    <div>
+                        <h4 style="margin-bottom: 10px; text-align: center;">Residual</h4>
+                        <div class="bar-chart" id="residual-chart"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="export-section">
+                <h3 style="margin-bottom: 15px;">Exportar Datos</h3>
+                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                    <button class="btn btn-success" onclick="exportToExcel()">📊 Exportar a Excel (CSV)</button>
+                    <button class="btn btn-primary" onclick="exportToJSON()">💾 Exportar a JSON</button>
+                    <button class="btn btn-primary" onclick="window.print()">🖨️ Imprimir Reporte</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let risks = [];
+        let currentFilter = 'TODOS';
+        let riskCounter = 1;
+
+        // Load data from localStorage
+        function loadData() {
+            const saved = localStorage.getItem('greenYellowRisks');
+            if (saved) {
+                risks = JSON.parse(saved);
+                riskCounter = risks.length > 0 ? Math.max(...risks.map(r => parseInt(r.id.split('-')[1]))) + 1 : 1;
+            } else {
+                // Load sample data
+                loadSampleData();
+            }
+            updateAllViews();
+        }
+
+        // Save data to localStorage
+        function saveData() {
+            localStorage.setItem('greenYellowRisks', JSON.stringify(risks));
+        }
+
+        // Load sample risks
+        function loadSampleData() {
+            const sampleRisks = [
+                {
+                    tipo: 'AGPE',
+                    categoria: 'Técnico',
+                    fase: 'O&M',
+                    descripcion: 'Bajo factor de planta por sombreamiento parcial en horas pico',
+                    causa: 'Vegetación no controlada en perímetro del proyecto',
+                    probInherente: 4,
+                    impactoInherente: 3,
+                    controlabilidad: 'Controlable',
+                    mitigacion: 'Programa de mantenimiento preventivo de vegetación cada 3 meses',
+                    responsable: 'Jefe O&M',
+                    probResidual: 2,
+                    impactoResidual: 2,
+                    estado: 'En Tratamiento'
+                },
+                {
+                    tipo: 'AGGE',
+                    categoria: 'Regulatorio',
+                    fase: 'O&M',
+                    descripcion: 'Cambios en Resolución CREG 030/2018 sobre esquemas de autogeneración',
+                    causa: 'Actualización regulatoria por parte de CREG',
+                    probInherente: 3,
+                    impactoInherente: 4,
+                    controlabilidad: 'No Controlable',
+                    mitigacion: 'Monitoreo mensual de actualizaciones regulatorias y ajuste de modelo de negocio',
+                    responsable: 'Director Regulatorio',
+                    probResidual: 3,
+                    impactoResidual: 3,
+                    estado: 'Abierto'
+                },
+                {
+                    tipo: 'Utility',
+                    categoria: 'Financiero',
+                    fase: 'Construcción',
+                    descripcion: 'Variación de tasa de cambio USD/COP en importación de paneles',
+                    causa: 'Volatilidad del mercado cambiario colombiano',
+                    probInherente: 4,
+                    impactoInherente: 5,
+                    controlabilidad: 'Parcialmente',
+                    mitigacion: 'Cobertura de forwards y negociación de precio fijo en COP',
+                    responsable: 'Director Financiero',
+                    probResidual: 2,
+                    impactoResidual: 3,
+                    estado: 'En Tratamiento'
+                },
+                {
+                    tipo: 'GD',
+                    categoria: 'Social',
+                    fase: 'Construcción',
+                    descripcion: 'Rechazo comunitario por proyecto en zona residencial',
+                    causa: 'Falta de socialización previa con comunidad',
+                    probInherente: 3,
+                    impactoInherente: 3,
+                    controlabilidad: 'Controlable',
+                    mitigacion: 'Jornadas de socialización y programa de beneficios comunitarios',
+                    responsable: 'Gerente de Proyecto',
+                    probResidual: 1,
+                    impactoResidual: 2,
+                    estado: 'Cerrado'
+                },
+                {
+                    tipo: 'AGPE',
+                    categoria: 'Ambiental',
+                    fase: 'O&M',
+                    descripcion: 'Contaminación de agua por productos químicos de limpieza de paneles',
+                    causa: 'Uso de detergentes no biodegradables',
+                    probInherente: 2,
+                    impactoInherente: 3,
+                    controlabilidad: 'Controlable',
+                    mitigacion: 'Protocolo de limpieza con agua desmineralizada y cepillos sin químicos',
+                    responsable: 'Supervisor O&M',
+                    probResidual: 1,
+                    impactoResidual: 1,
+                    estado: 'Cerrado'
+                },
+                {
+                    tipo: 'Utility',
+                    categoria: 'Contractual',
+                    fase: 'O&M',
+                    descripcion: 'Incumplimiento de disponibilidad mínima en PPA (95%)',
+                    causa: 'Fallas recurrentes en inversores centrales',
+                    probInherente: 3,
+                    impactoInherente: 5,
+                    controlabilidad: 'Controlable',
+                    mitigacion: 'Reemplazo de inversores críticos y mantenimiento predictivo',
+                    responsable: 'Director de Operaciones',
+                    probResidual: 1,
+                    impactoResidual: 2,
+                    estado: 'En Tratamiento'
+                }
+            ];
+
+            sampleRisks.forEach(risk => {
+                addRiskFromData(risk);
+            });
+        }
+
+        // Add risk from data object
+        function addRiskFromData(data) {
+            const risk = {
+                id: `R-${String(riskCounter).padStart(3, '0')}`,
+                fecha: new Date().toISOString().split('T')[0],
+                ...data,
+                nivelInherente: data.probInherente * data.impactoInherente,
+                nivelResidual: data.probResidual * data.impactoResidual
+            };
+            
+            risk.clasificacionInherente = getRiskClassification(risk.nivelInherente);
+            risk.clasificacionResidual = getRiskClassification(risk.nivelResidual);
+            
+            risks.push(risk);
+            riskCounter++;
+        }
+
+        // Switch tabs
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            
+            event.target.classList.add('active');
+            document.getElementById(tabName).classList.add('active');
+            
+            updateAllViews();
+        }
+
+        // Filter by project type
+        function filterByProject(type) {
+            currentFilter = type;
+            
+            document.querySelectorAll('.btn-filter').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            updateAllViews();
+        }
+
+        // Get filtered risks
+        function getFilteredRisks() {
+            if (currentFilter === 'TODOS') {
+                return risks;
+            }
+            return risks.filter(r => r.tipo === currentFilter);
+        }
+
+        // Get risk classification
+        function getRiskClassification(nivel) {
+            if (nivel <= 5) return 'BAJO';
+            if (nivel <= 12) return 'MEDIO';
+            if (nivel <= 20) return 'ALTO';
+            return 'CRÍTICO';
+        }
+
+        // Add new risk
+        function addRisk() {
+            const tipo = document.getElementById('tipo-proyecto').value;
+            const categoria = document.getElementById('categoria').value;
+            const fase = document.getElementById('fase').value;
+            const descripcion = document.getElementById('descripcion').value;
+            const causa = document.getElementById('causa').value;
+            const probInherente = parseInt(document.getElementById('prob-inherente').value);
+            const impactoInherente = parseInt(document.getElementById('impacto-inherente').value);
+            const controlabilidad = document.getElementById('controlabilidad').value;
+            const mitigacion = document.getElementById('mitigacion').value;
+            const responsable = document.getElementById('responsable').value;
+            const probResidual = parseInt(document.getElementById('prob-residual').value);
+            const impactoResidual = parseInt(document.getElementById('impacto-residual').value);
+            const estado = document.getElementById('estado').value;
+            const proyectoSel = document.getElementById('nombre-proyecto').value;
+            const proyectoOtro = document.getElementById('otro-proyecto').value.trim();
+            const nombreProyecto = (proyectoSel === '__OTRO__') ? proyectoOtro : proyectoSel;
+
+
+            if (!descripcion) {
+                alert('Por favor complete la descripción del riesgo');
+                return;
+            }
+
+            const risk = {
+                id: `R-${String(riskCounter).padStart(3, '0')}`,
+                fecha: new Date().toISOString().split('T')[0],
+                tipo,
+                categoria,
+                fase,
+                descripcion,
+                causa,
+                probInherente,
+                impactoInherente,
+                nivelInherente: probInherente * impactoInherente,
+                controlabilidad,
+                mitigacion,
+                responsable,
+                probResidual,
+                impactoResidual,
+                nivelResidual: probResidual * impactoResidual,
+                estado
+            };
+
+            risk.clasificacionInherente = getRiskClassification(risk.nivelInherente);
+            risk.clasificacionResidual = getRiskClassification(risk.nivelResidual);
+
+            risks.push(risk);
+            riskCounter++;
+            
+            saveData();
+            clearForm();
+            updateAllViews();
+            
+            alert('✅ Riesgo registrado exitosamente');
+        }
+
+        // Clear form
+        function clearForm() {
+            document.getElementById('descripcion').value = '';
+            document.getElementById('causa').value = '';
+            document.getElementById('mitigacion').value = '';
+            document.getElementById('responsable').value = '';
+        }
+
+        // Delete risk
+        function deleteRisk(id) {
+            if (confirm('¿Está seguro de eliminar este riesgo?')) {
+                risks = risks.filter(r => r.id !== id);
+                saveData();
+                updateAllViews();
+            }
+        }
+
+        // Update all views
+        function updateAllViews() {
+            updateKPIs();
+            updateRiskTable();
+            updateHeatMatrix();
+            updateCharts();
+        }
+
+        // Update KPIs
+        function updateKPIs() {
+            const filtered = getFilteredRisks();
+            
+            const total = filtered.length;
+            const bajo = filtered.filter(r => r.clasificacionInherente === 'BAJO').length;
+            const medio = filtered.filter(r => r.clasificacionInherente === 'MEDIO').length;
+            const alto = filtered.filter(r => r.clasificacionInherente === 'ALTO').length;
+            const critico = filtered.filter(r => r.clasificacionInherente === 'CRÍTICO').length;
+            
+            let efectividad = 0;
+            if (filtered.length > 0) {
+                const reduccion = filtered.reduce((sum, r) => {
+                    return sum + ((r.nivelInherente - r.nivelResidual) / r.nivelInherente);
+                }, 0);
+                efectividad = Math.round((reduccion / filtered.length) * 100);
+            }
+            
+            document.getElementById('kpi-total').textContent = total;
+            document.getElementById('kpi-bajo').textContent = bajo;
+            document.getElementById('kpi-medio').textContent = medio;
+            document.getElementById('kpi-alto').textContent = alto;
+            document.getElementById('kpi-critico').textContent = critico;
+            document.getElementById('kpi-efectividad').textContent = efectividad + '%';
+        }
+
+        // Update risk table
+        function updateRiskTable() {
+            const filtered = getFilteredRisks();
+            const tbody = document.getElementById('risk-table-body');
+            
+            if (filtered.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="12" style="text-align: center; color: #999;">No hay riesgos registrados para este filtro.</td></tr>';
+                return;
+            }
+            
+            tbody.innerHTML = filtered.map(r => `
+                <tr>
+                    <td><strong>${r.id}</strong></td>
+                    <td>${r.tipo}</td>
+                    <td>${r.nombreProyecto || '-'}</td>
+                    <td>${r.categoria}</td>
+                    <td>${r.fase}</td>
+                    <td>${r.descripcion.substring(0, 50)}...</td>
+                    <td>${r.probInherente}</td>
+                    <td>${r.impactoInherente}</td>
+                    <td>${r.nivelInherente}</td>
+                    <td><span class="risk-level risk-${r.clasificacionInherente.toLowerCase()}">${r.clasificacionInherente}</span></td>
+                    <td>${r.responsable || '-'}</td>
+                    <td>${r.estado}</td>
+                    <td>
+                        <div class="action-buttons">
+                            <button class="btn btn-danger btn-small" onclick="deleteRisk('${r.id}')">🗑️</button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // Update heat matrix
+        function updateHeatMatrix() {
+            const filtered = getFilteredRisks();
+            
+            // Reset all cells
+            for (let p = 1; p <= 5; p++) {
+                for (let i = 1; i <= 5; i++) {
+                    const cell = document.getElementById(`cell-${p}-${i}`);
+                    cell.textContent = '0';
+                    
+                    const nivel = p * i;
+                    const classification = getRiskClassification(nivel);
+                    const parent = cell.parentElement;
+                    parent.style.background = getColorForClassification(classification);
+                    parent.style.color = classification === 'CRÍTICO' ? 'white' : '#333';
+                }
+            }
+            
+            // Count risks in each cell
+            filtered.forEach(r => {
+                const cellId = `cell-${r.probInherente}-${r.impactoInherente}`;
+                const cell = document.getElementById(cellId);
+                if (cell) {
+                    cell.textContent = parseInt(cell.textContent) + 1;
+                }
+            });
+        }
+
+        // Get color for classification
+        function getColorForClassification(classification) {
+            switch(classification) {
+                case 'BAJO': return '#C6EFCE';
+                case 'MEDIO': return '#FFEB9C';
+                case 'ALTO': return '#FFC7CE';
+                case 'CRÍTICO': return '#FF0000';
+                default: return '#f8f9fa';
+            }
+        }
+
+        // Show risks in cell
+        function showRisksInCell(prob, imp) {
+            const filtered = getFilteredRisks();
+            const cellRisks = filtered.filter(r => r.probInherente === prob && r.impactoInherente === imp);
+            
+            if (cellRisks.length === 0) {
+                alert('No hay riesgos en esta celda');
+                return;
+            }
+            
+            const riskList = cellRisks.map(r => `• ${r.id}: ${r.descripcion}`).join('\n');
+            alert(`Riesgos en Prob=${prob}, Imp=${imp}:\n\n${riskList}`);
+        }
+
+        // Update charts
+        function updateCharts() {
+            updateCategoryChart();
+            updatePhaseChart();
+            updateProjectChart();
+            updateInherentResidualChart();
+        }
+
+        // Update category chart
+        function updateCategoryChart() {
+            const filtered = getFilteredRisks();
+            const categories = ['Técnico', 'Regulatorio', 'Social', 'Ambiental', 'Contractual', 'Financiero'];
+            const counts = categories.map(cat => filtered.filter(r => r.categoria === cat).length);
+            const max = Math.max(...counts, 1);
+            
+            const html = categories.map((cat, i) => `
+                <div class="bar-item">
+                    <div class="bar-label">${cat}</div>
+                    <div class="bar-container">
+                        <div class="bar-fill" style="width: ${(counts[i] / max) * 100}%">${counts[i]}</div>
+                    </div>
+                </div>
+            `).join('');
+            
+            document.getElementById('category-chart').innerHTML = html;
+        }
+
+        // Update phase chart
+        function updatePhaseChart() {
+            const filtered = getFilteredRisks();
+            const phases = ['Construcción', 'Puesta en Marcha', 'O&M'];
+            const counts = phases.map(phase => filtered.filter(r => r.fase === phase).length);
+            const max = Math.max(...counts, 1);
+            
+            const html = phases.map((phase, i) => `
+                <div class="bar-item">
+                    <div class="bar-label">${phase}</div>
+                    <div class="bar-container">
+                        <div class="bar-fill" style="width: ${(counts[i] / max) * 100}%">${counts[i]}</div>
+                    </div>
+                </div>
+            `).join('');
+            
+            document.getElementById('phase-chart').innerHTML = html;
+        }
+
+        // Update project chart
+        function updateProjectChart() {
+            const projects = ['AGPE', 'AGGE', 'GD', 'Utility'];
+            const counts = projects.map(proj => risks.filter(r => r.tipo === proj).length);
+            const max = Math.max(...counts, 1);
+            
+            const html = projects.map((proj, i) => `
+                <div class="bar-item">
+                    <div class="bar-label">${proj}</div>
+                    <div class="bar-container">
+                        <div class="bar-fill" style="width: ${(counts[i] / max) * 100}%">${counts[i]}</div>
+                    </div>
+                </div>
+            `).join('');
+            
+            document.getElementById('project-chart').innerHTML = html;
+        }
+
+        // Update inherent vs residual chart
+        function updateInherentResidualChart() {
+            const filtered = getFilteredRisks();
+            const classifications = ['BAJO', 'MEDIO', 'ALTO', 'CRÍTICO'];
+            
+            const inherentCounts = classifications.map(c => filtered.filter(r => r.clasificacionInherente === c).length);
+            const residualCounts = classifications.map(c => filtered.filter(r => r.clasificacionResidual === c).length);
+            
+            const maxInherent = Math.max(...inherentCounts, 1);
+            const maxResidual = Math.max(...residualCounts, 1);
+            
+            const inherentHtml = classifications.map((c, i) => `
+                <div class="bar-item">
+                    <div class="bar-label">${c}</div>
+                    <div class="bar-container">
+                        <div class="bar-fill" style="width: ${(inherentCounts[i] / maxInherent) * 100}%">${inherentCounts[i]}</div>
+                    </div>
+                </div>
+            `).join('');
+            
+            const residualHtml = classifications.map((c, i) => `
+                <div class="bar-item">
+                    <div class="bar-label">${c}</div>
+                    <div class="bar-container">
+                        <div class="bar-fill" style="width: ${(residualCounts[i] / maxResidual) * 100}%">${residualCounts[i]}</div>
+                    </div>
+                </div>
+            `).join('');
+            
+            document.getElementById('inherent-chart').innerHTML = inherentHtml;
+            document.getElementById('residual-chart').innerHTML = residualHtml;
+        }
+
+        // Export to Excel (CSV)
+        function exportToExcel() {
+            const headers = ['ID', 'Fecha', 'Tipo Proyecto', 'Categoría', 'Fase', 'Descripción', 'Causa', 
+                           'Prob. Inherente', 'Imp. Inherente', 'Nivel Inherente', 'Clasificación Inherente',
+                           'Controlabilidad', 'Mitigación', 'Responsable', 'Prob. Residual', 'Imp. Residual',
+                           'Nivel Residual', 'Clasificación Residual', 'Estado'];
+            
+            const rows = risks.map(r => [
+                r.id, r.fecha, r.tipo, r.categoria, r.fase, r.descripcion, r.causa,
+                r.probInherente, r.impactoInherente, r.nivelInherente, r.clasificacionInherente,
+                r.controlabilidad, r.mitigacion, r.responsable, r.probResidual, r.impactoResidual,
+                r.nivelResidual, r.clasificacionResidual, r.estado
+            ]);
+            
+            let csv = headers.join(',') + '\n';
+            rows.forEach(row => {
+                csv += row.map(cell => `"${cell}"`).join(',') + '\n';
+            });
+            
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `Matriz_Riesgo_GreenYellow_${new Date().toISOString().split('T')[0]}.csv`;
+            link.click();
+        }
+
+        // Export to JSON
+        function exportToJSON() {
+            const json = JSON.stringify(risks, null, 2);
+            const blob = new Blob([json], { type: 'application/json' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `Matriz_Riesgo_GreenYellow_${new Date().toISOString().split('T')[0]}.json`;
+            link.click();
+        }
+
+        // Initialize app
+        window.onload = function() {
+            loadData();
+        };
+        function setupProyectoOtro() {
+  const sel = document.getElementById('nombre-proyecto');
+  const group = document.getElementById('otro-proyecto-group');
+  const input = document.getElementById('otro-proyecto');
+
+  sel.addEventListener('change', () => {
+    const isOtro = sel.value === '__OTRO__';
+    group.style.display = isOtro ? 'block' : 'none';
+    if (!isOtro) input.value = '';
+  });
+}
+// Initialize app
+window.onload = function() {
+    loadData();
+};
+
+    </script>
+</body>
+</html>
+
